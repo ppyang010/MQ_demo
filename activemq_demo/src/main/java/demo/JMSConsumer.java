@@ -12,6 +12,8 @@ public class JMSConsumer {
     private static final String USERNAME = ActiveMQConnection.DEFAULT_USER;//默认连接用户名
     private static final String PASSWORD = ActiveMQConnection.DEFAULT_PASSWORD;//默认连接密码
     private static final String BROKEURL = ActiveMQConnection.DEFAULT_BROKER_URL;//默认连接地址
+    private static final String url1="tcp://192.168.101.172:61616";
+    private static final String url2="tcp://192.168.10.211:61616";
 
     public static void main(String[] args) {
         ConnectionFactory connectionFactory;//连接工厂
@@ -23,7 +25,7 @@ public class JMSConsumer {
         MessageConsumer messageConsumer;//消息的消费者
 
         //实例化连接工厂
-        connectionFactory = new ActiveMQConnectionFactory(JMSConsumer.USERNAME, JMSConsumer.PASSWORD, "tcp://192.168.101.172:61616");
+        connectionFactory = new ActiveMQConnectionFactory(JMSConsumer.USERNAME, JMSConsumer.PASSWORD, url2);
 
         try {
             //通过连接工厂获取连接
