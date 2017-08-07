@@ -21,7 +21,11 @@ import javax.jms.TextMessage;
 public class MessageController {
     private Logger logger = LoggerFactory.getLogger(MessageController.class);
     @Resource(name = "demoQueueDestination")
-    private Destination destination;
+    private Destination demoQueueDestination;
+
+    @Resource(name = "demoTopicDestination")
+    private Destination demoTopicDestination;
+
 
     //队列消息生产者
     @Resource(name = "producerService")
@@ -34,7 +38,7 @@ public class MessageController {
     @RequestMapping("/sendMsg")
     public void send(String msg){
         logger.info(Thread.currentThread().getName()+"------------send to jms Start");
-        producer.sendMsg(destination,msg);
+        producer.sendMsg(demoTopicDestination,msg);
         logger.info(Thread.currentThread().getName()+"------------send to jms End");
     }
 
@@ -43,7 +47,7 @@ public class MessageController {
     @ResponseBody
     public Object receive(){
         logger.info(Thread.currentThread().getName()+"------------receive from jms Start");
-        TextMessage tm = consumer.receive(destination);
+        TextMessage tm = consumer.receive(demoQueueDestination);
         logger.info(Thread.currentThread().getName()+"------------receive from jms End");
         return tm;
     }

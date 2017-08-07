@@ -18,14 +18,14 @@
   http://activemq.apache.org/schema/core/activemq-core-5.12.1.xsd"
 >
 
-
+    <context:property-placeholder location="classpath:db.properties"/>
     <!--    <context:component-scan base-package="com.Jayce" />-->
     <mvc:annotation-driven/>
 
     <amq:connectionFactory id="amqConnectionFactory"
-                           brokerURL="tcp://192.168.10.211:61616"
-                           userName="admin"
-                           password="admin"/>
+                           brokerURL="${activeMQ_URL}"
+                           userName="${activeMQ_username}"
+                           password="${activeMQ_password}"/>
 
     <!-- 配置JMS连接工厂 -->
     <bean id="connectionFactory"
@@ -35,11 +35,17 @@
     </bean>
 
     <!-- 定义消息队列（Queue） -->
+    <!--这个是队列目的地，点对点的-->
     <bean id="demoQueueDestination" class="org.apache.activemq.command.ActiveMQQueue">
         <!-- 设置消息队列的名字 -->
         <constructor-arg>
             <value>ccy</value>
         </constructor-arg>
+    </bean>
+
+    <!--这个是主题目的地，一对多的-->
+    <bean id="demoTopicDestination" class="org.apache.activemq.command.ActiveMQTopic">
+        <constructor-arg value="topic"/>
     </bean>
 
     <!-- 配置JMS模板（Queue），Spring提供的JMS工具类，它发送、接收消息。 -->
@@ -61,5 +67,17 @@
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="destination" ref="demoQueueDestination"/>
         <property name="messageListener" ref="queueMessageListener" />
+    </bean>
+
+
+    <!-- 配置消息队列监听者（Topic） -->
+    <bean id="topicMessageListener" class="mvc.listen.TopicMessageListener" />
+
+    <!-- 显示注入消息监听容器（Topic），配置连接工厂，监听的目标是demoTopicDestination，监听器是上面定义的监听器 -->
+    <bean id="topicListenerContainer"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="demoQueueDestination"/>
+        <property name="messageListener" ref="topicMessageListener" />
     </bean>
 </beans>
