@@ -9,12 +9,12 @@ import javax.jms.TextMessage;
  * 监听消息队列
  * Created by Administrator on 2017/8/6.
  */
-public class TopicMessageListener implements MessageListener {
+public class TopicMessageListener2 implements MessageListener {
     @Override
     public void onMessage(Message message) {
         TextMessage tm = (TextMessage) message;
         try {
-            System.out.println("TopicMessageListener监听到了文本消息：\t"
+            System.out.println("TopicMessageListener2监听到了文本消息：\t"
                     + tm.getText());
             //do something ...
         } catch (JMSException e) {

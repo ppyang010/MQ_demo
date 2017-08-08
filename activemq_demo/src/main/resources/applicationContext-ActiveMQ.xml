@@ -71,13 +71,24 @@
 
 
     <!-- 配置消息队列监听者（Topic） -->
-    <bean id="topicMessageListener" class="mvc.listen.TopicMessageListener" />
+    <bean id="topicMessageListener1" class="mvc.listen.TopicMessageListener1" />
 
     <!-- 显示注入消息监听容器（Topic），配置连接工厂，监听的目标是demoTopicDestination，监听器是上面定义的监听器 -->
-    <bean id="topicListenerContainer"
+    <bean id="topicListenerContainer1"
           class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="connectionFactory" ref="connectionFactory"/>
-        <property name="destination" ref="demoQueueDestination"/>
-        <property name="messageListener" ref="topicMessageListener" />
+        <property name="destination" ref="demoTopicDestination"/>
+        <property name="messageListener" ref="topicMessageListener1" />
+    </bean>
+
+    <!-- 配置消息队列监听者（Topic） -->
+    <bean id="topicMessageListener2" class="mvc.listen.TopicMessageListener2" />
+
+    <!-- 显示注入消息监听容器（Topic），配置连接工厂，监听的目标是demoTopicDestination，监听器是上面定义的监听器 -->
+    <bean id="topicListenerContainer2"
+          class="org.springframework.jms.listener.DefaultMessageListenerContainer">
+        <property name="connectionFactory" ref="connectionFactory"/>
+        <property name="destination" ref="demoTopicDestination"/>
+        <property name="messageListener" ref="topicMessageListener2" />
     </bean>
 </beans>
