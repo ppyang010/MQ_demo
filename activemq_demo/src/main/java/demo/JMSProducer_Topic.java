@@ -9,7 +9,7 @@ import javax.jms.*;
  * 消息的生产者（发送者）
  * Created by s on 2017/8/1.
  */
-public class JMSProducer {
+public class JMSProducer_Topic {
 
 
     //默认连接用户名
@@ -35,7 +35,7 @@ public class JMSProducer {
         //消息生产者
         MessageProducer messageProducer;
         //实例化连接工厂
-        connectionFactory = new ActiveMQConnectionFactory(JMSProducer.USERNAME, JMSProducer.PASSWORD, url1);
+        connectionFactory = new ActiveMQConnectionFactory(JMSProducer_Topic.USERNAME, JMSProducer_Topic.PASSWORD, url1);
 
         try {
             //通过连接工厂获取连接
@@ -45,7 +45,8 @@ public class JMSProducer {
             //创建session
             session = connection.createSession(true, Session.AUTO_ACKNOWLEDGE);
             //创建一个名称为HelloWorld的消息队列
-            destination = session.createQueue("q1");
+            //destination = session.createQueue("hella");
+            destination=session.createTopic("topic1");
             //创建消息生产者
             messageProducer = session.createProducer(destination);
             //发送消息
@@ -73,17 +74,15 @@ public class JMSProducer {
      * @throws Exception
      */
     public static void sendMessage(Session session,MessageProducer messageProducer) throws Exception{
-        for (int i = 0; i < JMSProducer.SENDNUM; i++) {
+        for (int i = 0; i < JMSProducer_Topic.SENDNUM; i++) {
             //创建一条文本消息
             int d=(int)(Math.random()*10);
             TextMessage message = session.createTextMessage("ActiveMQ 发送消息" +d);
-            //用于消息选择器选择
-            message.setIntProperty("time",d);
             System.out.println("发送消息：Activemq 发送消息" + d);
             //通过消息生产者发出消息
             //messageProducer.send(message);
 
-            messageProducer.send(message,1,d,30000);
+            messageProducer.send(message,DeliveryMode.NON_PERSISTENT,d,30000);
         }
 
     }
