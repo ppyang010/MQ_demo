@@ -38,6 +38,12 @@ public class MessageController {
     @RequestMapping("/sendMsg")
     public void send(String msg){
         logger.info(Thread.currentThread().getName()+"------------send to jms Start");
+        producer.sendMsg(demoQueueDestination,msg);
+        logger.info(Thread.currentThread().getName()+"------------send to jms End");
+    }
+    @RequestMapping("/sendMsgTopic")
+    public void send2(String msg){
+        logger.info(Thread.currentThread().getName()+"------------send to jms Start");
         producer.sendMsg(demoTopicDestination,msg);
         logger.info(Thread.currentThread().getName()+"------------send to jms End");
     }

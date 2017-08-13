@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SpikeMapper">
+  <resultMap id="SpikeMap" type="mvc.model.Spike">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="num" jdbcType="INTEGER" property="num" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+  </resultMap>
+  <insert id="addSpike" parameterType="mvc.model.Spike">
+     INSERT  INTO  temp_spike (num,remarks) VALUES (#{num},#{remarks})
+  </insert>
+</mapper>

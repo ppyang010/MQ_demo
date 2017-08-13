@@ -22,15 +22,38 @@
     <!--    <context:component-scan base-package="com.Jayce" />-->
     <mvc:annotation-driven/>
 
-    <amq:connectionFactory id="amqConnectionFactory"
-                           brokerURL="${activeMQ_URL}"
-                           userName="${activeMQ_username}"
-                           password="${activeMQ_password}"/>
+
+    <!-- 真正可以产生Connection的ConnectionFactory，由对应的 JMS服务厂商提供-->
+    <!--快速配置 需要jar包支持-->
+    <!--<amq:connectionFactory id="targetConnectionFactory"-->
+    <!--brokerURL="${activeMQ_URL}"-->
+    <!--userName="${activeMQ_username}"-->
+    <!--password="${activeMQ_password}"/>-->
+    <bean id="targetConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory">
+        <property name="brokerURL" value="${activeMQ_URL}"/>
+        <property name="userName" value="${activeMQ_username}"/>
+        <property name="password" value="${activeMQ_password}"/>
+        <property name="redeliveryPolicy" ref="activeMQRedeliveryPolicy" />  <!-- 引用重发机制 -->
+    </bean>
+    <!-- 定义ReDelivery(重发机制)机制 ，重发时间间隔是100毫秒，最大重发次数是3次 http://www.kuqin.com/shuoit/20140419/339344.html -->
+    <bean id="activeMQRedeliveryPolicy" class="org.apache.activemq.RedeliveryPolicy">
+        <!--是否在每次尝试重新发送失败后,增长这个等待时间 -->
+        <property name="useExponentialBackOff" value="true"></property>
+        <!--重发次数,默认为6次   这里设置为1次 -->
+        <property name="maximumRedeliveries" value="1"></property>
+        <!--重发时间间隔,默认为1秒 -->
+        <property name="initialRedeliveryDelay" value="1000"></property>
+        <!--第一次失败后重新发送之前等待500毫秒,第二次失败再等待500 * 2毫秒,这里的2就是value -->
+        <property name="backOffMultiplier" value="2"></property>
+        <!--最大传送延迟，只在useExponentialBackOff为true时有效（V5.5），假设首次重连间隔为10ms，倍数为2，那么第
+            二次重连时间间隔为 20ms，第三次重连时间间隔为40ms，当重连时间间隔大的最大重连时间间隔时，以后每次重连时间间隔都为最大重连时间间隔。 -->
+        <property name="maximumRedeliveryDelay" value="1000"></property>
+    </bean>
 
     <!-- 配置JMS连接工厂 -->
     <bean id="connectionFactory"
           class="org.springframework.jms.connection.CachingConnectionFactory">
-        <constructor-arg ref="amqConnectionFactory"/>
+        <constructor-arg ref="targetConnectionFactory"/>
         <property name="sessionCacheSize" value="100"/>
     </bean>
 
@@ -51,22 +74,37 @@
     <!-- 配置JMS模板（Queue），Spring提供的JMS工具类，它发送、接收消息。 -->
     <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
         <property name="connectionFactory" ref="connectionFactory"/>
+        <!--默认目的地-->
         <property name="defaultDestination" ref="demoQueueDestination"/>
         <property name="receiveTimeout" value="10000"/>
         <!-- true是topic，false是queue，默认是false，此处显示写出false -->
         <property name="pubSubDomain" value="false"/>
+        <!--session 事务 true开启  默认false-->
+        <property name="sessionTransacted" value="false"/>
+        <!--确认机制/自动签收机制-->
+        <property name="sessionAcknowledgeMode" value="2"/>
+        <!--AUTO_ACKNOWLEDGE = 1 ：自动确认-->
+        <!--CLIENT_ACKNOWLEDGE = 2：客户端手动确认 这个在spring中会被自动确认应使用4-->
+        <!--DUPS_OK_ACKNOWLEDGE = 3： 自动批量确认-->
+        <!--SESSION_TRANSACTED = 0：事务提交并确认-->
+        <!--但是在activemq补充了一个自定义的ACK模式:-->
+        <!--INDIVIDUAL_ACKNOWLEDGE = 4：单条消息确认-->
     </bean>
 
-
-    <!-- 配置消息队列监听者（Queue） -->
-    <bean id="queueMessageListener" class="mvc.listen.QueueMessageListener" />
+    <!--消息监听者-->
+    <!-- 配置消息队列监听者（Queue） 改为扫描-->
+    <!--<bean id="queueMessageListener" class="mvc.listen.QueueMessageListener" />-->
 
     <!-- 显示注入消息监听容器（Queue），配置连接工厂，监听的目标是demoQueueDestination，监听器是上面定义的监听器 -->
     <bean id="queueListenerContainer"
           class="org.springframework.jms.listener.DefaultMessageListenerContainer">
         <property name="connectionFactory" ref="connectionFactory"/>
         <property name="destination" ref="demoQueueDestination"/>
-        <property name="messageListener" ref="queueMessageListener" />
+        <property name="messageListener" ref="queueMessageListener2" />
+        <!--session 事务 true开启  默认false-->
+        <property name="sessionTransacted" value="false"/>
+        <!--使用监听的话要单独配置确认机制-->
+        <property name="sessionAcknowledgeMode" value="4"/>
     </bean>
 
 

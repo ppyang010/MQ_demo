@@ -3,24 +3,23 @@ package mvc.listen;
 import mvc.dao.SpikeDao;
 import mvc.model.Spike;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.stereotype.Component;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageListener;
+import javax.jms.Session;
 import javax.jms.TextMessage;
 
 /**
- * 监听消息队列
- * Created by Administrator on 2017/8/6.
+ * Created by Administrator on 2017/8/13.
  */
-@Component("queueMessageListener")
-public class QueueMessageListener implements MessageListener {
-
+@Component("queueMessageListener2")
+public class QueueMessageListener2 implements SessionAwareMessageListener {
     @Autowired
     SpikeDao spikeDao;
     @Override
-    public void onMessage(Message message) {
+    public void onMessage(Message message, Session session) throws JMSException {
         TextMessage tm = (TextMessage) message;
         try {
             System.out.println("QueueMessageListener监听到了文本消息：\t"
@@ -30,10 +29,13 @@ public class QueueMessageListener implements MessageListener {
             spike.setNum(1);
             spike.setRemarks(tm.getText());
             spikeDao.addSpike(spike);
-            //手动签收
+            session.recover();
+//            //手动签收
 //            tm.acknowledge();
-            System.out.println("手动签收成功");
+//            System.out.println("手动签收成功");
         } catch (JMSException e) {
+            //消息确认失败 重发消息
+            session.recover();
             e.printStackTrace();
         }
     }

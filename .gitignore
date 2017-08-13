@@ -32,3 +32,4 @@ hs_err_pid*
 
 /activemq_demo/target/
 /activemq-reference/target/
+/classes/

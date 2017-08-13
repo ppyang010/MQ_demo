@@ -21,7 +21,7 @@ public class JMSProducer {
     //发送的消息数量
     private static final int SENDNUM = 10;
     private static final String url1="tcp://192.168.101.172:61616";
-    private static final String url2="tcp://192.168.10.211:61616";
+    private static final String url2="tcp://192.168.190.211:61616";
 
     public static void main(String[] args) {
         //连接工厂
@@ -35,7 +35,7 @@ public class JMSProducer {
         //消息生产者
         MessageProducer messageProducer;
         //实例化连接工厂
-        connectionFactory = new ActiveMQConnectionFactory(JMSProducer.USERNAME, JMSProducer.PASSWORD, url1);
+        connectionFactory = new ActiveMQConnectionFactory(JMSProducer.USERNAME, JMSProducer.PASSWORD, url2);
 
         try {
             //通过连接工厂获取连接
